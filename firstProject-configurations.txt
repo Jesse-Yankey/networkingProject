@@ -1,0 +1,551 @@
+LONDON-CORE-SW-1 n LONDON-CORE-SW-2 CONFIGURATION
+
+hostname LONDON-CORE-SW-1
+
+ip routing
+no ip domain-lookup
+
+line console 0
+login
+logging synchronous
+
+line vty 0 4
+login local
+logging synchronous
+transport input ssh
+
+no ip domain-lookup
+
+username jesse privilege 15 secret jesse
+username nelly secret slivermist
+
+ip domain-name xyz.org.gh
+crytpo key generate rsa
+2048
+
+ip ssh version 2
+
+ip dhcp excluded-address 10.20.10.1 10.20.10.20
+ip dhcp excluded-address 10.20.20.1 10.20.20.20
+ip dhcp excluded-address 10.20.30.1 10.20.30.20
+ip dhcp excluded-address 10.20.40.1 10.20.40.20
+
+ip dhcp pool SALES/MARKETING
+network 10.20.10.0 255.255.255.0
+default-router 10.20.1.254
+dns-server 8.8.8.8
+
+ip dhcp pool ENGINEERING
+network 10.20.20.0 255.255.255.0
+default-router 10.20.1.254
+dns-server 8.8.8.8
+
+ip dhcp pool PUBLIC-RELATIONS
+network 10.20.30.0 255.255.255.0
+default-router 10.20.1.254
+dns-server 8.8.8.8
+
+ip dhcp pool HR
+network 10.20.40.0 255.255.255.0
+default-router 10.20.1.254
+dns-server 8.8.8.8
+
+lldp run
+cdp run
+
+int vlan 1
+ip address 10.20.1.2 255.255.255.0
+no shut
+
+vlan 10
+name SALES/MARKETING
+interface vlan10
+ip address 10.20.10.1 255.255.255.0
+standby 1 ip 10.20.1.254
+standby 1 priority 200
+standby 1 preempt
+no shut
+
+vlan 20
+name PUBLIC-RELATIONS
+int vlan20
+ip address 10.20.20.1 255.255.255.0
+standby 1 ip 10.20.1.254
+standby 1 priority 200
+standby 1 preempt
+no shut
+
+vlan 30
+name ENGINEERING
+int vlan30
+ip address 10.20.30.1 255.255.255.0
+standby 1 ip 10.20.1.254
+standby 1 priority 100
+no shut
+
+vlan 40
+name HR
+int vlan40
+ip address 10.20.40.1 255.255.255.0
+standby 1 ip 10.20.1.254
+standby 1 priority 100
+no shut
+
+vlan 100
+name MNGT
+int vlan100
+ip address 10.20.100.2 255.255.255.0
+standby 1 ip 10.20.1.254
+standby 1 priority 100
+c
+
+spanning-tree vlan 1 root primary
+spanning-tree vlan 10 root primary
+spanning-tree vlan 20 root primary
+spanning-tree vlan 30 root secondary
+spanning-tree vlan 40 root secondary
+spanning-tree vlan 100 root secondary
+
+
+int range gi1/0/1-5
+switchport mode trunk
+
+int range gi1/0/6-21
+shut
+
+int gi1/0/22
+switchport mode access
+switchport access vlan 100
+
+int gi1/0/23-24
+switchport mode trunk
+shut
+channel-group 1 mode active
+
+int port-channel 1
+no switchport
+ip address ip address 10.20.2.254 255.255.255.0
+
+int gi1/0/23-24
+no shut
+
+router ospf 1
+router-id 1.1.1.1
+network 10.20.0.0 0.0.255.255 area 0
+
+end
+
+
+
+
+
+
+hostname LONDON-CORE-SW-2
+
+ip routing
+no ip domain-lookup
+
+line console 0
+login
+logging synchronous
+
+line vty 0 4
+login local
+logging synchronous
+transport input ssh
+
+username jesse privilege 15 secret jesse
+username nelly secret slivermist
+
+ip domain-name xyz.org.gh
+crytpo key generate rsa
+2048
+
+ip ssh version 2
+
+ip dhcp excluded-address 10.20.10.1 10.20.10.20
+ip dhcp excluded-address 10.20.20.1 10.20.20.20
+ip dhcp excluded-address 10.20.30.1 10.20.30.20
+ip dhcp excluded-address 10.20.40.1 10.20.40.20
+
+ip dhcp pool SALES/MARKETING
+network 10.20.10.0 255.255.255.0
+default-router 10.20.1.254
+dns-server 8.8.8.8
+
+ip dhcp pool ENGINEERING
+network 10.20.20.0 255.255.255.0
+default-router 10.20.1.254
+dns-server 8.8.8.8
+
+ip dhcp pool PUBLIC-RELATIONS
+network 10.20.30.0 255.255.255.0
+default-router 10.20.1.254
+dns-server 8.8.8.8
+
+ip dhcp pool HR
+network 10.20.40.0 255.255.255.0
+default-router 10.20.1.254
+dns-server 8.8.8.8
+
+lldp run
+cdp run
+
+
+int vlan 1
+ip address 10.20.1.2 255.255.255.0
+no shut
+
+vlan 10
+name SALES/MARKETING
+interface vlan10
+ip address 10.20.10.1 255.255.255.0
+standby 1 ip 10.20.1.254
+standby 1 priority 100
+no shut
+
+vlan 20
+name PUBLIC-RELATIONS
+int vlan20
+ip address 10.20.20.1 255.255.255.0
+standby 1 ip 10.20.1.254
+standby 1 priority 100
+no shut
+
+vlan 30
+name ENGINEERING
+int vlan30
+ip address 10.20.30.1 255.255.255.0
+standby 1 ip 10.20.1.254
+standby 1 priority 200
+standby 1 preempt
+no shut
+
+vlan 40
+name HR
+int vlan40
+ip address 10.20.40.1 255.255.255.0
+standby 1 ip 10.20.1.254
+standby 1 priority 200
+standby 1 preempt
+no shut
+
+vlan 100
+name MNGT
+int vlan100
+ip address 10.20.100.2 255.255.255.0
+standby 1 ip 10.20.1.254
+standby 1 priority 200
+standby 1 preempt
+no shut
+
+spanning-tree vlan 1 root secondary
+spanning-tree vlan 10 root secondary
+spanning-tree vlan 20 root secondary
+spanning-tree vlan 30 root primary
+spanning-tree vlan 40 root primary
+spanning-tree vlan 100 root primary
+
+
+int range gi1/0/1-5
+switchport mode trunk
+
+int range gi1/0/6-21
+shut
+
+int gi1/0/22
+no switchport
+ip address 10.20.0.1 255.255.255.0
+
+int gi1/0/23-24
+switchport mode trunk
+shut
+channel-group 1 mode active
+
+int port-channel 1
+no switchport
+ip address ip address 10.20.2.254 255.255.255.0
+
+int gi1/0/23-24
+no shut
+
+router ospf 1
+router-id 1.1.1.1
+network 10.20.0.0 0.0.255.255 area 0
+
+
+end
+
+
+
+
+
+
+
+MANCHESTER-CORE-SW-1 n MANCHESTER-CORE-SW-2 CONFIGURATION
+hostname MAN-CORE-SW-1
+
+ip routing
+no ip domain-lookup
+
+line console 0
+login local
+logging synchronous
+
+line vty 0 4
+login local
+logging synchronous
+transport input ssh
+
+username jesse privilege 15 secret jesse
+username keziah secret mamakhay
+
+ip domain-name xyz.org.gh
+crytpo key generate rsa
+2048
+
+ip ssh version 2
+
+ip dhcp excluded-address 10.30.10.1 10.30.10.20
+ip dhcp excluded-address 10.30.20.1 10.30.20.20
+ip dhcp excluded-address 10.30.30.1 10.30.30.20
+ip dhcp excluded-address 10.30.40.1 10.30.40.20
+
+ip dhcp pool SALES/MARKETING
+network 10.30.10.0 255.255.255.0
+default-router 10.30.1.254
+dns-server 8.8.8.8
+
+ip dhcp pool ENGINEERING
+network 10.30.20.0 255.255.255.0
+default-router 10.30.1.254
+dns-server 8.8.8.8
+
+ip dhcp pool PUBLIC-RELATIONS
+network 10.30.30.0 255.255.255.0
+default-router 10.30.1.254
+dns-server 8.8.8.8
+
+ip dhcp pool HR
+network 10.30.40.0 255.255.255.0
+default-router 10.30.1.254
+dns-server 8.8.8.8
+
+lldp run
+cdp run
+
+vtp domain MANCHESTER
+vtp mode transparent
+
+int vlan 1
+ip address 10.30.1.252 255.255.255.0
+standby 1 ip 10.30.1.254
+standby 1 priority 200
+standby 1 preempt
+no shut
+
+vlan 10
+name SALES/MARKETING
+int vlan 10
+ip address 10.30.10.252 255.255.255.0
+standby 1 ip 10.30.1.254
+standby 1 priority 200
+standby 1 preempt
+no shut
+
+vlan 20
+name PUBLIC-RELATIONS
+int vlan 20
+ip address 10.30.20.252 255.255.255.0
+standby 1 ip 10.30.1.254
+standby 1 priority 200
+standby 1 preempt
+no shut
+
+vlan 30
+name ENGINEERING
+int vlan 30
+ip address 10.30.30.252 255.255.255.0
+standby 1 ip 10.30.1.254
+no shut
+
+vlan 40
+name HR
+int vlan 40
+ip address 10.30.40.252 255.255.255.0
+standby 1 ip 10.30.1.254
+no shut
+
+vlan 100
+name MNGT
+int vlan 100
+ip address 10.30.100.252 255.255.255.0
+standby 1 ip 10.30.1.254
+no shut
+
+spanning-tree vlan 1 root primary
+spanning-tree vlan 10 root primary
+spanning-tree vlan 20 root primary
+spanning-tree vlan 30 root secondary
+spanning-tree vlan 40 root secondary
+spanning-tree vlan 100 root secondary
+
+int gi1/0/1-5
+switchport mode trunk
+
+int range gi1/0/6-21
+shutdown
+
+int gi1/0/22
+switchport mode access
+switchport access vlan 100
+
+int gi1/0/23-24
+switchport mode trunk
+shut
+channel-group 1 mode active
+
+int port-channel 1
+no switchport
+ip address 10.30.2.254 255.255.255.0
+
+router ospf 1
+network 10.30.0.0 0.0.255.255 area 0
+
+end
+
+
+
+
+
+hostname MAN-CORE-SW-2
+
+ip routing
+no ip domain-lookup
+
+line console 0
+login local
+logging synchronous
+
+line vty 0 4
+login local
+logging synchronous
+transport input ssh
+
+username jesse privilege 15 secret jesse
+username keziah secret mamakhay
+
+ip domain-name xyz.org.gh
+crytpo key generate rsa
+2048
+
+ip ssh version 2
+
+ip dhcp excluded-address 10.30.10.1 10.30.10.20
+ip dhcp excluded-address 10.30.20.1 10.30.20.20
+ip dhcp excluded-address 10.30.30.1 10.30.30.20
+ip dhcp excluded-address 10.30.40.1 10.30.40.20
+
+ip dhcp pool SALES/MARKETING
+network 10.30.10.0 255.255.255.0
+default-router 10.30.1.254
+dns-server 8.8.8.8
+
+ip dhcp pool ENGINEERING
+network 10.30.20.0 255.255.255.0
+default-router 10.30.1.254
+dns-server 8.8.8.8
+
+ip dhcp pool PUBLIC-RELATIONS
+network 10.30.30.0 255.255.255.0
+default-router 10.30.1.254
+dns-server 8.8.8.8
+
+ip dhcp pool HR
+network 10.30.40.0 255.255.255.0
+default-router 10.30.1.254
+dns-server 8.8.8.8
+
+lldp run
+cdp run
+
+vtp domain MANCHESTER
+vtp mode transparent
+
+int vlan 1
+ip address 10.30.1.252 255.255.255.0
+standby 1 ip 10.30.1.254
+no shut
+
+vlan 10
+name SALES/MARKETING
+int vlan 10
+ip address 10.30.10.252 255.255.255.0
+standby 1 ip 10.30.1.254
+no shut
+
+vlan 20
+name PUBLIC-RELATIONS
+int vlan 20
+ip address 10.30.20.252 255.255.255.0
+standby 1 ip 10.30.1.254
+no shut
+
+vlan 30
+name ENGINEERING
+int vlan 30
+ip address 10.30.30.252 255.255.255.0
+standby 1 ip 10.30.1.254
+standby 1 priority 200
+standby 1 preempt
+no shut
+
+vlan 40
+name HR
+int vlan 40
+ip address 10.30.40.252 255.255.255.0
+standby 1 ip 10.30.1.254
+standby 1 priority 200
+standby 1 preempt
+no shut
+
+vlan 100
+name MNGT
+int vlan 100
+ip address 10.30.100.252 255.255.255.0
+standby 1 ip 10.30.1.254
+standby 1 priority 200
+standby 1 preempt
+no shut
+
+spanning-tree vlan 1 root secondary
+spanning-tree vlan 10 root secondary
+spanning-tree vlan 20 root secondary
+spanning-tree vlan 30 root primary
+spanning-tree vlan 40 root primary
+spanning-tree vlan 100 root primary
+
+int gi1/0/1-5
+switchport mode trunk
+
+int range gi1/0/6-21
+shutdown
+
+int gi1/0/22
+no switchport
+ip address 10.30.0.1 255.255.255.252
+
+int gi1/0/23-24
+switchport mode trunk
+shut
+channel-group 1 mode active
+
+int port-channel 1
+no switchport
+ip address 10.30.2.254 255.255.255.0
+
+router ospf 1
+router-id 5.5.5.5
+network 10.30.0.0 0.0.255.255 area 0
+
+end

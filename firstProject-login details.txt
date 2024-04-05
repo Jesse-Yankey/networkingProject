@@ -1,0 +1,15 @@
+Login Details of London Core Switches
+Users 		Password
+Jesse		jesse
+Nelly		slivermist
+
+enable password
+cisco
+
+Login Details of Manchester Core Switches
+Users 		Password
+Jesse		jesse
+Keziah		mamakhay
+
+enable password
+cisco
