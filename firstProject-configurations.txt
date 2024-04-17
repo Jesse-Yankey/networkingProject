@@ -2,11 +2,14 @@ LONDON-CORE-SW-1 n LONDON-CORE-SW-2 CONFIGURATION
 
 hostname LONDON-CORE-SW-1
 
+enable secret cisco
+
 ip routing
-no ip domain-lookup
+ip domain-lookup
+ip name-server 8.8.8.8
 
 line console 0
-login
+login local
 logging synchronous
 
 line vty 0 4
@@ -14,13 +17,12 @@ login local
 logging synchronous
 transport input ssh
 
-no ip domain-lookup
 
 username jesse privilege 15 secret jesse
 username nelly secret slivermist
 
 ip domain-name xyz.org.gh
-crytpo key generate rsa
+crypto key generate rsa
 2048
 
 ip ssh version 2
@@ -143,10 +145,11 @@ end
 hostname LONDON-CORE-SW-2
 
 ip routing
-no ip domain-lookup
+ip domain-lookup
+ip name-server 8.8.8.8
 
 line console 0
-login
+login local
 logging synchronous
 
 line vty 0 4
@@ -154,11 +157,12 @@ login local
 logging synchronous
 transport input ssh
 
+
 username jesse privilege 15 secret jesse
 username nelly secret slivermist
 
 ip domain-name xyz.org.gh
-crytpo key generate rsa
+crypto key generate rsa
 2048
 
 ip ssh version 2
@@ -286,7 +290,8 @@ MANCHESTER-CORE-SW-1 n MANCHESTER-CORE-SW-2 CONFIGURATION
 hostname MAN-CORE-SW-1
 
 ip routing
-no ip domain-lookup
+ip domain-lookup
+ip name-server 8.8.8.8
 
 line console 0
 login local
@@ -301,7 +306,7 @@ username jesse privilege 15 secret jesse
 username keziah secret mamakhay
 
 ip domain-name xyz.org.gh
-crytpo key generate rsa
+crypto key generate rsa
 2048
 
 ip ssh version 2
@@ -420,8 +425,11 @@ end
 
 hostname MAN-CORE-SW-2
 
+enable secret cisco
+
 ip routing
-no ip domain-lookup
+ip domain-lookup
+ip name-server 8.8.8.8
 
 line console 0
 login local
@@ -436,7 +444,7 @@ username jesse privilege 15 secret jesse
 username keziah secret mamakhay
 
 ip domain-name xyz.org.gh
-crytpo key generate rsa
+crypto key generate rsa
 2048
 
 ip ssh version 2
@@ -549,3 +557,78 @@ router-id 5.5.5.5
 network 10.30.0.0 0.0.255.255 area 0
 
 end
+
+
+
+
+
+
+
+LONDON ROUTER
+hostname LONDON-ROUTER
+
+int gi0/0/0
+description LNK-TO-LONDON-CORE-SW-2
+ip address 10.20.0.5 255.255.255.252
+
+int gi0/0/1
+description LNK-TO-INTERNET-ROUTER
+ip address 10.20.0.5 255.255.255.252
+
+router ospf 1
+router-id 2.2.2.2
+network 10.20.0.0 0.0.255.255 area 0
+
+
+
+
+
+
+MANCHESTER ROUTER
+hostname MANCHESTER-ROUTER
+
+int gi0/0/0
+description LNK-TO-MANCHESTER-CORE-SW-2
+ip address 10.30.0.5 255.255.255.252
+
+int gi0/0/1
+description LNK-TO-INTERNET-ROUTER
+ip address 10.30.0.5 255.255.255.252
+
+router ospf 1
+router-id 4.4.4.4
+network 10.30.0.0 0.0.255.255 area 0
+
+
+
+
+
+
+INTERNET ROUTER
+hostname INTERNET-ROUTER
+int gi0/0
+description LINK-TO-LONDON-ROUTER
+ip address 10.20.0.6 255.255.255.252
+ip nat inside
+
+int gi0/1
+description LINK-TO-MAN-ROUTER
+ip address 10.30.0.6 255.255.255.252
+ip nat inside
+
+int gi0/2
+ip address dhcp
+ip nat outside
+
+exit
+
+router ospf 1
+router-id 9.9.9.9
+network 10.20.0.0 0.0.255.255 area 0
+network 10.30.0.0 0.0.255.255 area 0
+default-information originate
+
+exit
+
+ip nat inside source list 1 int gi0/2 overload
+access-list 1 permit any
